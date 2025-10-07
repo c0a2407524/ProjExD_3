@@ -7,7 +7,8 @@ import pygame as pg
 
 WIDTH = 1100  # ゲームウィンドウの幅
 HEIGHT = 650  # ゲームウィンドウの高さ
-NUM_OF_BOMBS = 5  # ボムの数  
+NUM_OF_BOMBS = 5  # ボムの数
+
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -141,11 +142,32 @@ class Bomb:
         screen.blit(self.img, self.rct)
 
 
+class Score:
+    """
+    爆弾を撃ち落とした数を表示するクラス
+    """
+    def __init__(self,):
+        """
+        文字列Surfaceを生成する
+        """
+        self.score_origin = 0
+        self.fonto = pg.font.SysFont("hgp創英角ﾎﾟｯﾌﾟ体", 30)
+        self.img = self.fonto.render("スコア:0", True, (0, 0, 255))
+
+    def update(self, screen: pg.Surface):
+        """
+        スコアを更新する
+        """
+        self.score = self.fonto.render(f"スコア:{self.score_origin}", True, (0, 0, 255))
+        screen.blit(self.score, [100, 600])
+
+
 def main():
     pg.display.set_caption("たたかえ！こうかとん")
     screen = pg.display.set_mode((WIDTH, HEIGHT))    
     bg_img = pg.image.load("fig/pg_bg.jpg")
     bird = Bird((300, 200))
+    score = Score()
     bombs = list()  #bomb用の空のリスト
     for _ in range(NUM_OF_BOMBS):
         bomb = Bomb((255, 0, 0), 10)
@@ -181,7 +203,10 @@ def main():
                 if beam.rct.colliderect(bomb.rct):
                     #beamとbombの衝突判定
                     beam, bombs[i] = None, None
+                    score.score_origin += 1
                     bird.change_img(6, screen)
+        score.update(screen)
+                    
         bombs = [bomb for bomb in bombs if bomb is not None]
 
 
